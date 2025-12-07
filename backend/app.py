@@ -24,7 +24,7 @@ Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 # CORS for React
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000","http://127.0.0.1:3000","http://127.0.0.1:8000","https://mamasync-backend.onrender.com"],
+    allow_origins=["http://localhost:3000","http://127.0.0.1:3000","http://127.0.0.1:8000","https://mamasync-backend.onrender.com","https://mama-sync.onrender.com"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
