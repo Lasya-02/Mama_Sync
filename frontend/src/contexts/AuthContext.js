@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
 
           sessionStorage.setItem('authToken', response.data.token);
           sessionStorage.setItem('userdata', JSON.stringify(response.data.user));
-
+          console.log(userdata)
       } catch (error) {
         console.error("Login failed:", error);
         throw error; 
