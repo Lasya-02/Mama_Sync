@@ -82,11 +82,11 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build backend image
-        run: docker build --no-cache -t ${{ secrets.DOCKERHUB_USERNAME }}/mamasync-backend:latest backend
+        run: docker build --no-cache -t ${{ secrets.DOCKERHUB_USERNAME }}/mamasync-backend:render backend
 
       - name: Build frontend image
         run: |
-          frontend_image=${{ secrets.DOCKERHUB_USERNAME }}/mamasync-frontend:latest
+          frontend_image=${{ secrets.DOCKERHUB_USERNAME }}/mamasync-frontend:render
           docker build --no-cache \
           --build-arg REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }} \
           --build-arg REACT_APP_GOOGLE_MAPS_API_KEY=${{ secrets.REACT_APP_GOOGLE_MAPS_API_KEY }} \
@@ -101,17 +101,17 @@ jobs:
           -e MONGO_DB=${{ secrets.MONGO_DB }} \
           -e JWT_SECRET_KEY=testsecret \
           -p 8000:8000 \
-          ${{ secrets.DOCKERHUB_USERNAME }}/mamasync-backend:latest &
+          ${{ secrets.DOCKERHUB_USERNAME }}/mamasync-backend:render &
           sleep 5
           curl -X POST http://localhost:8000/login \
            -H "Content-Type: application/json" \
            -d '{"username":"test", "password":"test"}'
 
       - name: Push backend image
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/mamasync-backend:latest
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/mamasync-backend:render
 
       - name: Push frontend image
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/mamasync-frontend:latest
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/mamasync-frontend:render
 
   snyk-security-scan:
     name: Snyk Security Scan
@@ -159,15 +159,15 @@ jobs:
     # Build Docker images
     - name: Build Docker Images
       run: |
-        docker build -t mamasync-backend:latest backend
-        docker build -t mamasync-frontend:latest frontend
+        docker build -t mamasync-backend:render backend
+        docker build -t mamasync-frontend:render frontend
 
     # Container scan
     - name: Snyk Container Scan (Backend)
-      run: snyk container test mamasync-backend:latest --severity-threshold=high --policy-path=.snyk
+      run: snyk container test mamasync-backend:render --severity-threshold=high --policy-path=.snyk
 
     - name: Snyk Container Scan (Frontend)
-      run: snyk container test mamasync-frontend:latest --severity-threshold=high --policy-path=.snyk
+      run: snyk container test mamasync-frontend:render --severity-threshold=high --policy-path=.snyk
 
   security-scan:
     name: Security Scan (Semgrep + Bandit + ESLint)
