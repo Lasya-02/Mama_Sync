@@ -82,11 +82,11 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build backend image
-        run: docker build --no-cache -t ${{ secrets.DOCKERHUB_USERNAME }}/mamasync-backend:render backend
+        run: docker build --no-cache -t ${{ secrets.DOCKERHUB_USERNAME }}/mamasync-backend-render:render backend
 
       - name: Build frontend image
         run: |
-          frontend_image=${{ secrets.DOCKERHUB_USERNAME }}/mamasync-frontend:render
+          frontend_image=${{ secrets.DOCKERHUB_USERNAME }}/mamasync-frontend-render:render
           docker build --no-cache \
           --build-arg REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }} \
           --build-arg REACT_APP_GOOGLE_MAPS_API_KEY=${{ secrets.REACT_APP_GOOGLE_MAPS_API_KEY }} \
@@ -94,10 +94,10 @@ jobs:
           docker run --rm $frontend_image sh -c 'echo $REACT_APP_GOOGLE_MAPS_API_KEY'
 
       - name: Push backend image
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/mamasync-backend:render
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/mamasync-backend-render:render
 
       - name: Push frontend image
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/mamasync-frontend:render
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/mamasync-frontend-render:render
 
   snyk-security-scan:
     name: Snyk Security Scan
