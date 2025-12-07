@@ -1,0 +1,154 @@
+/* Fullscreen layout */
+.login-page {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: linear-gradient(135deg, #171515, #0f1113);
+}
+
+/* Split content */
+.login-content {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+/* Left: Brand */
+.login-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 12vw;
+  color: #f7f1f1;
+}
+
+.brand-title {
+  font-size: 8rem;
+  font-family: 'Oleo Script', cursive;
+  color: #ff6b81;
+  margin-bottom: 1rem;
+  margin-left: 6vw;
+}
+
+.brand-tagline {
+  font-size: 1.3rem;
+  font-weight: 400;
+  opacity: 0.8;
+  margin-left: 6vw;
+}
+
+/* Right: Login Card */
+.login-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-right: 12vw;
+}
+
+.login-box {
+  background: rgb(2, 2, 2);
+  border-radius: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  padding: 3rem;
+  width: 100%;
+  max-width: 600px;
+  position: relative;
+  z-index: 2;
+  min-height: 450px;
+}
+
+/* Header */
+.login-header h2 {
+  font-size: 2rem;
+  color: #ff6b81;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.login-header p {
+  text-align: center;
+  color: #eae1e1;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* Form */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.login-form input {
+  padding: 0.8rem 1rem;
+  border-radius: 0.8rem;
+  border: 1.5px solid #ddd;
+  font-size: 1rem;
+}
+
+.login-form input:focus {
+  border-color: #ff6b81;
+  outline: none;
+}
+
+.login-form button {
+  padding: 0.8rem;
+  border: none;
+  border-radius: 0.8rem;
+  background: linear-gradient(135deg, #ff8aa2, #ff6b81);
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.login-form button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(255, 107, 129, 0.25);
+}
+
+/* Footer */
+.login-footer {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color:#faf8f9;
+}
+
+.login-footer a {
+  color:#ff6b81;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.login-footer a:hover {
+  color: #f6f6f8;
+}
+
+
+/* Responsive */
+@media (max-width: 768px) {
+  .login-content {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .login-left,
+  .login-right {
+    flex: none;
+    width: 100%;
+    text-align: center;
+    padding: 0;
+  }
+
+  .brand-title {
+    font-size: 3rem;
+  }
+}

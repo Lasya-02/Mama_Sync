@@ -1,0 +1,31 @@
+/* Container tweaks */
+.container {
+  max-width: 700px;
+}
+
+.text-muted {
+  color: white !important;
+}
+
+/* Reply card styling */
+.reply-card {
+  border-left: 4px solid#e85c70;
+  background-color: #000000;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+/* Reply form spacing */
+.reply-form textarea {
+  font-size: 0.95rem;
+}
+
+/* Button styling */
+button.btn-success {
+  background-color:#e85c70;
+  border: none;
+}
+
+button.btn-success:hover {
+  background-color: #eb8cac;
+}

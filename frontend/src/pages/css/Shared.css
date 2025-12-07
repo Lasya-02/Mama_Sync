@@ -1,0 +1,79 @@
+/* Blobs */
+.background-blobs {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.3;
+  filter: blur(100px);
+  transition: transform 0.2s ease-out;
+}
+
+.blob1 {
+  width: 400px;
+  height: 400px;
+  background: #1dec24;
+  top: 10%;
+  left: 5%;
+}
+
+.blob2 {
+  width: 300px;
+  height: 300px;
+  background: #f00cb7;
+  bottom: 15%;
+  right: 10%;
+}
+
+.blob3 {
+  width: 350px;
+  height: 350px;
+  background: #f4f810;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.blob4 {
+  width: 250px;
+  height: 250px;
+  background: #ec074c;
+  bottom: 5%;
+  left: 20%;
+}
+.blob5 {
+  width: 280px;
+  height: 280px;
+  background: #ee0f43; /* soft peach tone */
+  top: 20%;
+  right: 25%;
+}
+.blob6 {
+  width: 320px;
+  height: 320px;
+  background: #45a9e2; /* soft mint green */
+  top: 70%;
+  left: 10%;
+}
+.blob7 {
+  width: 300px;
+  height: 300px;
+  background: #3135ee; /* soft lavender */
+  top: 30%;
+  right: 40%;
+}
+.blob8 {
+  width: 260px;
+  height: 260px;
+  background: #cc20ee; /* soft pink */
+  bottom: 55%;
+  left: 30%;
+}

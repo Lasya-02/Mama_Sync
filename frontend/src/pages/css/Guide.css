@@ -1,0 +1,65 @@
+.guide-container {
+  max-width: 900px;
+  margin: auto;
+  padding: 24px;
+  background: linear-gradient(to bottom right, #fce7f3, #fdf2f8, #f3e8ff);
+  min-height: 100vh;
+}
+
+.guide-title {
+  text-align: center;
+  font-size: 32px;
+  font-weight: bold;
+  color: #1f2937;
+  margin-bottom: 20px;
+}
+
+.guide-dropdown {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  font-size: 16px;
+  margin-bottom: 24px;
+}
+
+.guide-content {
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.guide-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.guide-emoji {
+  font-size: 50px;
+  display: block;
+}
+
+.guide-subtitle {
+  color: #6b7280;
+}
+
+.guide-tips {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.guide-card {
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.tip-emoji {
+  font-size: 32px;
+}

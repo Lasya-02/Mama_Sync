@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+pydantic
+pymongo
+python-dotenv
+PyJWT
+pytest
+httpx
+email-validator
+prometheus-client
+prometheus-fastapi-instrumentator
+pytest-cov

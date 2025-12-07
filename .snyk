@@ -1,0 +1,11 @@
+version: v1.27.0
+ignore:
+  SNYK-JS-NTHCHECK-1586032:
+    - '*':
+        reason: "CRA (react-scripts) locks nth-check@1.x; only affects build tooling, not production."
+        expires: "2026-12-31T23:59:59Z"
+
+  SNYK-JS-WEBPACKDEVSERVER-10300775:
+    - '*':
+        reason: "webpack-dev-server vulnerability only affects local dev server; not used in production."
+        expires: "2026-12-31T23:59:59Z"

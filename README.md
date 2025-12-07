@@ -1,1 +1,2 @@
-# Mama_Sync
+Project Description: 
+MamaSync is a web application designed to support working mothers during pregnancy by helping them stay organized, healthy, and emotionally balanced. It offers a personalized daily dashboard with hydration, meal, stretch, and appointment reminders, along with mood check-ins and uplifting content. Key features include a month-wise medical checklist, doctor visit tracker, community forum, insights dashboard for tracking health trends, and a hospital finder for emergencies. The goal is to provide one reliable space for managing routines, staying informed, and reducing stress while balancing work and well-being.
