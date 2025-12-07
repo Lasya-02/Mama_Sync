@@ -104,8 +104,8 @@ jobs:
           ${{ secrets.DOCKERHUB_USERNAME }}/mamasync-backend:render &
           sleep 5
           curl -X POST http://localhost:8000/login \
-           -H "Content-Type: application/json" \
-           -d '{"username":"test", "password":"test"}'
+          -H "Content-Type: application/json" \
+          -d '{"username":"test", "password":"test"}'
 
       - name: Push backend image
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/mamasync-backend:render
