@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   backend:
-    image: ${DOCKERHUB_USERNAME}/mamasync-backend:render
+    image: ${DOCKERHUB_USERNAME}/mamasync-backend-render:render
     container_name: mamasync-backend-render
     environment:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
@@ -15,7 +15,7 @@ services:
     restart: always
 
   frontend:
-    image: ${DOCKERHUB_USERNAME}/mamasync-frontend:render
+    image: ${DOCKERHUB_USERNAME}/mamasync-frontend-render:render
     container_name: mamasync-frontend-render
     ports:
       - "80:80"
