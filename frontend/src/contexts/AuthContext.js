@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
               console.error("Error parsing user data from session storage:", error);
               logout(); 
             }
-          
+          }
       } catch (error) {
         console.error("Login failed:", error);
         throw error; 
