@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const storedToken = sessionStorage.getItem('authToken');
     const storedUser = sessionStorage.getItem('userdata');
-
+     console.log(sessionStorage.getItem('userdata'),"t1")
     if (storedToken && storedUser) {
       try {
         setUser(JSON.parse(storedUser));
@@ -35,7 +35,17 @@ export const AuthProvider = ({ children }) => {
 
           sessionStorage.setItem('authToken', response.data.token);
           sessionStorage.setItem('userdata', JSON.stringify(response.data.user));
-          console.log(userdata)
+          const storedToken = sessionStorage.getItem('authToken');
+          const storedUser = sessionStorage.getItem('userdata');
+          console.log(sessionStorage.getItem('userdata'),"t1")
+          if (storedToken && storedUser) {
+            try {
+              setUser(JSON.parse(storedUser));
+            } catch (error) {
+              console.error("Error parsing user data from session storage:", error);
+              logout(); 
+            }
+          
       } catch (error) {
         console.error("Login failed:", error);
         throw error; 
