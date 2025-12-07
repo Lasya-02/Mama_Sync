@@ -824,3 +824,6 @@ def delete_mood(request:Request,userId: str, date: str):
     
     return {"message": "Mood entry deleted"}
 
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+
