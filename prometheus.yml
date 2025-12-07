@@ -1,9 +1,0 @@
-global:
-  scrape_interval: 15s
-
-scrape_configs:
-  - job_name: "mamasync-backend"
-    static_configs:
-      - targets: ["mamasync-backend:8000"]
-        labels:
-          app: "mamasync"
