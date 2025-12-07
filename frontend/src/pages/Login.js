@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "./css/Login.css";
 import "./css/Shared.css";
-import axios from 'axios';
 
 import { useAuth } from '../contexts/AuthContext'; 
 
@@ -20,7 +19,6 @@ export default function Login() {
     e.preventDefault();
    
       try {
-
         await login(email, password ); 
         navigate("/dashboard");
       } catch (err) {

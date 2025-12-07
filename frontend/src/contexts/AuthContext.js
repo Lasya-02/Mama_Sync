@@ -1,63 +1,69 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import { createContext, useContext, useState, useEffect } from 'react';
+import apiClient from '../service/Api';
 
 const AuthContext = createContext(null);
-const apiURL = process.env.REACT_APP_API_URL;
-console.log("API_URL being used:", apiURL);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const token = sessionStorage.getItem('userToken');
-    const userdata = sessionStorage.getItem('userdata');
-    if (token && userdata) {
-      return JSON.parse(userdata);
-    }
-    return null;
-  });
-
+  const [user, setUser] = useState(null); 
+  const [loading, setLoading] = useState(true); 
+  
   useEffect(() => {
-    const token = sessionStorage.getItem('userToken');
-    if (token) {
-      setUser({ isLoggedIn: true }); // Simplified user object on load
+    const storedToken = sessionStorage.getItem('authToken');
+    const storedUser = sessionStorage.getItem('userdata');
+
+    if (storedToken && storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error("Error parsing user data from session storage:", error);
+        logout(); 
+      }
     }
+
+    setLoading(false); 
   }, []);
 
-  const login = async (email, password) => {
+  const isLoggedIn = !!user;
+
+  const login = async (email,password) => {
     try {
 
-      const response = await axios.post(
-        `${apiURL}/login`, // Replace with your backend URL
-        { "email": email, "password": password }
-      );
+      const response = await apiClient.post(
+            '/login', 
+            {"email":email,"password":password}
+          );
 
-      //headers: {
-      //    Authorization: `Bearer ${token}`,
-      //  }
+          sessionStorage.setItem('authToken', response.data.token);
+          sessionStorage.setItem('userdata', JSON.stringify(response.data.user));
 
-      //console.log(response.data)
-      // Assuming your backend returns a JWT token in response.data.token
-      sessionStorage.setItem('userToken', response.data.token);
-
-
-      sessionStorage.setItem('userdata', JSON.stringify(response.data.user));
-
-      // For this example, we just set a mock user object
-      setUser(response.data.userDetails || { isLoggedIn: true, email });
-
-    } catch (error) {
-      console.error("Login failed:", error);
-      throw error; // Re-throw so your Login page can handle errors
+      } catch (error) {
+        console.error("Login failed:", error);
+        throw error; 
     }
   };
 
   const logout = () => {
-    sessionStorage.removeItem('userToken');
+    sessionStorage.removeItem('authToken');
+    sessionStorage.removeItem('userdata');
     setUser(null);
     alert("You have signed out.");
   };
+  
+  const getToken = () => {
+      return sessionStorage.getItem('authToken');
+  };
+
+  const contextValue = {
+    user,
+    loading,
+    isLoggedIn, 
+    login,
+    logout,
+    getToken,
+  };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

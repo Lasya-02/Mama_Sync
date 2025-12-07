@@ -1,21 +1,20 @@
-import React, { useState,useEffect } from "react";
+import { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./css/Register.css";
 import "./css/Shared.css";
-import axios from "axios";
+import apiClient from "../service/Api";
 
 import { useAuth } from '../contexts/AuthContext'; 
-const apiURL = process.env.REACT_APP_API_URL;
+
 export default function AccountProfile() {
 
-    const { logout } = useAuth(); 
+  const { logout } = useAuth(); 
   
   const navigate = useNavigate();
-  // Temporary state (no localStorage)
+
   const [profile, setProfile] = useState({
-    _id:"",
-    name: "",
     email: "",
+    name: "",
     pregnancyMonth: "",
     working: false,
     workHours: "",
@@ -25,17 +24,27 @@ export default function AccountProfile() {
     emergencyContact: "",
     dueDate: "",
     height: "",
-    weight: "",
+    weight: ""
   });
 
-   useEffect(() => {
+    const loaddata = async () => {
+       try {
+       const storedDataString = sessionStorage.getItem('userdata'); 
+        const updateddata = await apiClient.get(
+          `/user/`+JSON.parse(storedDataString)["email"]
+        );     
 
-    const storedDataString = sessionStorage.getItem('userdata'); 
+        if(updateddata){
+            setProfile(updateddata.data.userdata)
+        }
 
-    if (storedDataString) {
-      const parsedData = JSON.parse(storedDataString);
-      setProfile(parsedData); 
+      } catch (err) {
+        alert("please try after sometime");
+      }  
+  
     }
+   useEffect(() => {
+   loaddata();
   }, []); 
 
   const [error, setError] = useState("");
@@ -63,30 +72,19 @@ export default function AccountProfile() {
     }
      try {
 
-        const response = await axios.put(
-          `${apiURL}/updateprofile`, // Replace with your backend URL
+        const response = await apiClient.put(
+          `/updateprofile`, 
           profile
         );
 
         alert("Profile updated successfully!");
         
-        const updateddata = await axios.get(
-          `${apiURL}/user/`+profile['_id'], // Replace with your backend URL
-          profile
-        );     
-
-        if(updateddata){
-          sessionStorage.setItem("userdata",JSON.stringify(updateddata.data))
-        }
-
       } catch (err) {
         alert("Profile not updated! please try after sometime");
       }  
   };
 
   const handleSignOut = () => {
-   // alert("You have signed out.");
-   // navigate("/");
    logout();
    navigate("/");
   };

@@ -1,54 +1,51 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./css/PostDetail.css";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import axios from "axios";   // ✅ added
+import apiClient from "../service/Api";
+
 dayjs.extend(utc);
 
 export default function PostDetail() {
-  const { id } = useParams();          // postId from URL
-  const location = useLocation();      // post passed via navigate state
+  const { id } = useParams();         
+  const location = useLocation();      
   const [post, setPost] = useState(location.state || null);
   const [replies, setReplies] = useState([]);
   const [replyContent, setReplyContent] = useState("");
-  const apiURL = process.env.REACT_APP_API_URL;
-  // Replace with logged-in userId from your auth context
+
   const uuss = sessionStorage.getItem("userdata") || "{}";
   const parsedData = JSON.parse(uuss);
   const userId = parsedData.email || "TestUser";
   const userName = parsedData.name || "TestUser";
 
-  // ✅ Fetch post if not passed in state (axios version)
   useEffect(() => {
     if (!post) {
-      axios
-        .get(`${apiURL}/forum/${id}`)
+      apiClient
+        .get(`/forum/${id}`)
         .then((res) => setPost(res.data))
         .catch((err) => console.error("Error fetching post:", err));
     }
   }, [id, post]);
 
-  // ✅ Fetch replies (axios version)
   useEffect(() => {
-    axios
-      .get(`${apiURL}/forum/${id}/replies`)
+    apiClient
+      .get(`/forum/${id}/replies`)
       .then((res) => setReplies(res.data))
       .catch((err) => console.error("Error fetching replies:", err));
   }, [id]);
 
-  // ✅ Submit a reply (axios version)
   const handleReplySubmit = async (e) => {
     e.preventDefault();
     const newReply = { content: replyContent, userId };
 
     try {
-      const res = await axios.post(
-        `${apiURL}/forum/${id}/replies`,
+      const res = await apiClient.post(
+        `/forum/${id}/replies`,
         newReply
       );
-      setReplies([...replies, res.data]);   // update UI
+      setReplies([...replies, res.data]);
       setReplyContent("");
     } catch (err) {
       console.error("Error posting reply:", err);
@@ -88,7 +85,6 @@ export default function PostDetail() {
             </div>
           )}
 
-          {/* Reply Form */}
           <form className="reply-form" onSubmit={handleReplySubmit}>
             <div className="mb-3">
               <textarea

@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./css/CommunityForum.css";
+import apiClient from "../service/Api";
 
 export default function CommunityForum() {
   const navigate = useNavigate();
@@ -10,15 +10,14 @@ export default function CommunityForum() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
-  const apiURL = process.env.REACT_APP_API_URL;
   // Replace with logged-in userId from your auth context
   const uuss = sessionStorage.getItem("userdata") || "{}";
   const parsedData = JSON.parse(uuss);
   const userId = parsedData.name || "TestUser";
 
   useEffect(() => {
-    axios
-      .get(`${apiURL}/forum`)
+    apiClient
+      .get(`/forum`)
       .then((res) => setPosts(res.data))
       .catch((err) => console.error(err));
   }, []);
@@ -28,7 +27,7 @@ export default function CommunityForum() {
     const newPost = { title, content, userId };
 
     try {
-      const res = await axios.post(`${apiURL}/forum`, newPost);
+      const res = await apiClient.post(`/forum`, newPost);
       setPosts([...posts, res.data]);
       setTitle("");
       setContent("");

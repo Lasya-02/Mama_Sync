@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './css/Register.css';
 import './css/Shared.css';
-import axios from 'axios';
+import apiClient from '../service/Api';
 
 export default function Register() {
   const [email, setEmail] = useState('');
@@ -20,7 +20,6 @@ export default function Register() {
   const [weight, setWeight] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [formError, setFormError] = useState('');
-  const apiURL = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -79,8 +78,8 @@ export default function Register() {
 
    try {
 
-        const response = await axios.post(
-          `${apiURL}/register`, // Replace with your backend URL
+        const response = await apiClient.post(
+          `/register`, // Replace with your backend URL
           {
             "email": email,
             "name": name,
@@ -98,7 +97,6 @@ export default function Register() {
           }        
         );
 
-   
        navigate("/");
       } catch (err) {
         setFormError(err.response?.data?.message || 'Registration failed. Please try again.');

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import "./css/Reminder.css";
-import axios from "axios";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import apiClient from "../service/Api";
+
 dayjs.extend(utc);
 
 export default function Reminder() {
@@ -20,14 +21,13 @@ export default function Reminder() {
     repeat: "none",
   });
 
-  const apiURL = process.env.REACT_APP_API_URL;
   const uuss = sessionStorage.getItem("userdata") || "{}";
   const parsedData = JSON.parse(uuss);
   const userId = parsedData.email || "TestUser";
 
   const loadreminder = async () => {
     try {
-      const res = await axios.get(`${apiURL}/getreminder`, { params: { userId } });
+      const res = await apiClient.get(`/getreminder`, { params: { userId } });
       setReminders(res.data.reminders || []);
     } catch (e) {
       alert("Please try again later");
@@ -97,7 +97,7 @@ export default function Reminder() {
 
     if (editingId) {
       try {
-        await axios.put(`${apiURL}/updatereminder/${editingId}`, { userId, ...formData }, { params: { userId } });
+        await apiClient.put(`/updatereminder/${editingId}`, { userId, ...formData }, { params: { userId } });
         loadreminder();
         alert("Updated reminder successfully.");
       } catch (e) {
@@ -106,7 +106,7 @@ export default function Reminder() {
       setEditingId(null);
     } else {
       try {
-        await axios.post(`${apiURL}/createreminder`, { userId, ...formData });
+        await apiClient.post(`/createreminder`, { userId, ...formData });
         loadreminder();
         alert("Added reminder successfully.");
       } catch (err) {
@@ -136,7 +136,7 @@ export default function Reminder() {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this reminder?")) {
       try {
-        await axios.delete(`${apiURL}/deletereminder/${id}`, { params: { userId } });
+        await apiClient.delete(`/deletereminder/${id}`, { params: { userId } });
         loadreminder();
       } catch (e) {
         alert("Failed to delete reminder. Please try again.");

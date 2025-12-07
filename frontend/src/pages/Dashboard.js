@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState,useRef } from "react";
 import "./css/Dashboard.css";
-
-const apiURL = process.env.REACT_APP_API_URL;
+import apiClient from "../service/Api";
 
 export default function Dashboard() {
   const uuss = sessionStorage.getItem("userdata") || "{}";
@@ -58,12 +56,14 @@ export default function Dashboard() {
     { emoji: "🤢", label: "Unwell", value: "unwell" },
   ];
 
+    const effectRan = useRef(false); 
+
   // ----------------------------------------------------------------
   // LOAD TASKS
   // ----------------------------------------------------------------
   const loadTasks = async () => {
     try {
-      const res = await axios.get(`${apiURL}/tasks`, {
+      const res = await apiClient.get(`/tasks`, {
         params: { userId, date: today },
       });
 
@@ -87,8 +87,8 @@ export default function Dashboard() {
   // ----------------------------------------------------------------
   const initializeDefaultTasks = async () => {
     try {
-      const promises = defaultTasks.map((task) =>
-        axios.post(`${apiURL}/tasks`, {
+      const promises = defaultTasks.map(async (task) =>
+        await apiClient.post(`/tasks`, {
           userId,
           date: today,
           emoji: task.emoji,
@@ -111,7 +111,7 @@ export default function Dashboard() {
   // ----------------------------------------------------------------
   const loadWaterIntake = async () => {
     try {
-      const res = await axios.get(`${apiURL}/waterintake`, {
+      const res = await apiClient.get(`/waterintake`, {
         params: { userId, date: today },
       });
 
@@ -142,7 +142,7 @@ export default function Dashboard() {
   // ----------------------------------------------------------------
   const loadMood = async () => {
     try {
-      const res = await axios.get(`${apiURL}/mood`, {
+      const res = await apiClient.get(`/mood`, {
         params: { userId, date: today },
       });
       
@@ -155,9 +155,13 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    loadTasks();
-    loadWaterIntake();
-    loadMood();
+    if (!effectRan.current) {
+      loadTasks();
+      loadWaterIntake();
+      loadMood();
+      effectRan.current = true;
+    }
+
   }, []);
 
   // ----------------------------------------------------------------
@@ -175,7 +179,7 @@ export default function Dashboard() {
     }
 
     try {
-      await axios.post(`${apiURL}/tasks`, {
+      await apiClient.post(`/tasks`, {
         userId,
         date: today,
         emoji: "📝",
@@ -204,8 +208,8 @@ export default function Dashboard() {
   // ----------------------------------------------------------------
   const toggleComplete = async (task) => {
     try {
-      await axios.patch(
-        `${apiURL}/tasks/${task.id}`,
+      await apiClient.patch(
+        `/tasks/${task.id}`,
         { completed: !task.completed },
         { params: { userId, date: today } }
       );
@@ -228,7 +232,7 @@ export default function Dashboard() {
     if (!taskToDelete) return;
 
     try {
-      await axios.delete(`${apiURL}/tasks/${taskToDelete.id}`, {
+      await apiClient.delete(`/tasks/${taskToDelete.id}`, {
         params: { userId, date: today },
       });
 
@@ -251,7 +255,7 @@ export default function Dashboard() {
   // ----------------------------------------------------------------
   const handleMoodSelect = async (moodValue) => {
     try {
-      await axios.post(`${apiURL}/mood`, {
+      await apiClient.post(`/mood`, {
         userId,
         date: today,
         mood: moodValue,
@@ -271,8 +275,8 @@ export default function Dashboard() {
     if (waterIntake < waterGoal) {
       try {
         // Add 250ml (1 glass)
-        await axios.patch(
-          `${apiURL}/waterintake/add`,
+        await apiClient.patch(
+          `/waterintake/add`,
           { amount: 250 },
           { params: { userId, date: today } }
         );
@@ -287,8 +291,8 @@ export default function Dashboard() {
     if (waterIntake > 0) {
       try {
         // Subtract 250ml (1 glass) - negative amount
-        await axios.patch(
-          `${apiURL}/waterintake/add`,
+        await apiClient.patch(
+          `/waterintake/add`,
           { amount: -250 },
           { params: { userId, date: today } }
         );

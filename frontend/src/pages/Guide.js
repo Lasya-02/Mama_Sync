@@ -1,22 +1,37 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./css/Guide.css";
+import apiClient from "../service/Api";
 
 export default function Guide() {
   const [documents, setDocuments] = useState([]);
   const [selectedDoc, setSelectedDoc] = useState(null);
-  const apiURL = process.env.REACT_APP_API_URL;
-  useEffect(() => {
-    fetch(`${apiURL}/guide`)
-      .then((res) => res.json())
-      .then((data) => setDocuments(data.documents));
-  }, []);
 
-  const loadDocument = (id) => {
-    fetch(`${apiURL}/guide/${id}`)
-      .then((res) => res.json())
-      .then((data) => setSelectedDoc(data));
+useEffect(() => {
+  const loadGuides = async () => {
+    try {
+      const res = await apiClient.get("/guide");   // ✅ await is now valid
+      if (res.data) {
+        setDocuments(res.data.documents);
+      }
+    } catch (e) {
+      console.error("Error loading tasks:", e);
+    }
   };
 
+  loadGuides();  
+}, []);
+
+
+  const loadDocument = async (id) => {
+    try {
+      const res = await apiClient.get(`/guide/${id}`);
+      if(res.data){
+      setSelectedDoc(res.data)}
+    } catch (e) {
+      console.error("Error loading tasks:", e);
+    } 
+  };
+  
   return (
     <div className="guide-container">
       <h1 className="guide-title">💗 Pregnancy Guide Library 💗</h1>
