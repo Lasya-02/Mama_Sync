@@ -20,6 +20,7 @@ export default function Login() {
    
       try {
         await login(email, password ); 
+        console.log("After login, user:", user);
         navigate("/dashboard");
       } catch (err) {
         setloginError(err.response?.data?.message || 'Login failed. Invalid credentials.');
