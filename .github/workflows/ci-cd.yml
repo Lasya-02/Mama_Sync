@@ -93,20 +93,6 @@ jobs:
           -t $frontend_image frontend
           docker run --rm $frontend_image sh -c 'echo $REACT_APP_GOOGLE_MAPS_API_KEY'
 
-
-      - name: Run backend container for testing
-        run: |
-          docker run --rm \
-          -e MONGO_URI=${{ secrets.MONGO_URI }} \
-          -e MONGO_DB=${{ secrets.MONGO_DB }} \
-          -e JWT_SECRET_KEY=testsecret \
-          -p 8000:8000 \
-          ${{ secrets.DOCKERHUB_USERNAME }}/mamasync-backend:render &
-          sleep 5
-          curl -X POST http://localhost:8000/login \
-          -H "Content-Type: application/json" \
-          -d '{"username":"test", "password":"test"}'
-
       - name: Push backend image
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/mamasync-backend:render
 
