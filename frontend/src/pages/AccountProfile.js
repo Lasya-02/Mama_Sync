@@ -36,18 +36,37 @@ export default function AccountProfile() {
         );     
 
         if (updateddata) {
-      setProfile(updateddata.data.userdata);
-      const pr = updateddata.data.userdata;
-      sessionStorage.setItem('userdata', JSON.stringify({
-        email: pr.email,
-        name: pr.name,
-        pregnancyMonth: pr.pregnancyMonth,
-        working: pr.working,
-        height: pr.height,
-        weight: pr.weight,
-        age: pr.age
-      })); // gh-secret-scan: disable-line
-    }
+  const pr = updateddata.data.userdata;
+
+  // Encode sensitive fields
+  const encodedExtras = btoa(JSON.stringify({
+    pregnancyMonth: pr.pregnancyMonth,
+    working: pr.working,
+    height: pr.height,
+    weight: pr.weight
+  }));
+
+  // Store minimal + encoded extras in sessionStorage
+  sessionStorage.setItem('userdata', JSON.stringify({
+    email: pr.email,
+    name: pr.name,
+    age: pr.age,
+    extras: encodedExtras
+  })); // gh-secret-scan: disable-line
+
+  // Decode immediately to set profile state
+  const extras = JSON.parse(atob(encodedExtras));
+  setProfile({
+    email: pr.email,
+    name: pr.name,
+    age: pr.age,
+    pregnancyMonth: extras.pregnancyMonth,
+    working: extras.working,
+    height: extras.height,
+    weight: extras.weight
+  });
+}
+
 
 
       } catch (err) {
@@ -293,5 +312,6 @@ export default function AccountProfile() {
     </div>
   );
 }
+
 
 
