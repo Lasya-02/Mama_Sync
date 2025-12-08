@@ -35,44 +35,31 @@ export default function AccountProfile() {
           `/user/`+JSON.parse(storedDataString)["email"]
         );     
 
-        if (updateddata) {
-  const pr = updateddata.data.userdata;
+       if (updateddata) {
+      const pr = updateddata.data.userdata;
 
-  // Encode sensitive fields
-  const encodedExtras = btoa(JSON.stringify({
-    pregnancyMonth: pr.pregnancyMonth,
-    working: pr.working,
-    height: pr.height,
-    weight: pr.weight
-  }));
+      // Set profile state
+      const profileData = {
+        email: pr.email,
+        name: pr.name,
+        pregnancyMonth: Number(pr.pregnancyMonth) || 0,
+        working: pr.working,
+        workHours: Number(pr.workHours) || 0,
+        wakeTime: pr.wakeTime,
+        sleepTime: pr.sleepTime,
+        mealTime: pr.mealTime,
+        emergencyContact: pr.emergencyContact,
+        dueDate: pr.dueDate,
+        height: Number(pr.height) || 0,
+        weight: Number(pr.weight) || 0,
+        age: Number(pr.age) || 0
+      };
 
-  // Store minimal + encoded extras in sessionStorage
-  sessionStorage.setItem('userdata', JSON.stringify({
-    email: pr.email,
-    name: pr.name,
-    age: pr.age,
-    extras: encodedExtras
-  })); // gh-secret-scan: disable-line
+      setProfile(profileData);
 
-  // Decode immediately to set profile state
-  const extras = JSON.parse(atob(encodedExtras));
-  setProfile({
-    email: pr.email,
-    name: pr.name,
-    age: Number(pr.age) || 0,
-    pregnancyMonth: Number(extras.pregnancyMonth) || 0,
-    working: extras.working,
-    height: Number(extras.height) || 0,
-    weight: Number(extras.weight) || 0,
-    workHours: Number(pr.workHours) || 0,
-    wakeTime: pr.wakeTime,
-    sleepTime: pr.sleepTime,
-    mealTime: pr.mealTime,
-    emergencyContact: pr.emergencyContact,
-    dueDate: pr.dueDate
-  });
-}
-
+      // Store full profile in sessionStorage directly
+      sessionStorage.setItem('userdata', JSON.stringify(profileData)); // gh-secret-scan: disable-line
+    }
 
 
       } catch (err) {
@@ -318,6 +305,7 @@ export default function AccountProfile() {
     </div>
   );
 }
+
 
 
 
