@@ -17,8 +17,28 @@ from moodrepository import mood_repository
 import jwt
 from datetime import datetime, timedelta, timezone
 from typing import List
-
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import Response
 app = FastAPI()
+
+class CSPMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response: Response = await call_next(request)
+        
+        response.headers['Content-Security-Policy'] = (
+            "default-src 'self'; "
+            "script-src 'self' https://cdnjs.cloudflare.com; "
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+            "font-src 'self' https://fonts.gstatic.com; "
+            "img-src 'self' data: https://example.com; "
+            "connect-src 'self'; "
+            "frame-ancestors 'none'; "
+            "base-uri 'self';"
+        )
+        
+        return response
+
+app.add_middleware(CSPMiddleware)
 
 # instrument metrics
 Instrumentator().instrument(app).expose(app, endpoint="/metrics")
@@ -835,4 +855,5 @@ def delete_mood(request:Request,userId: str, date: str):
         raise HTTPException(status_code=404, detail="Mood entry not found")
     
     return {"message": "Mood entry deleted"}
+
 
