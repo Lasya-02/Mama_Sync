@@ -35,19 +35,27 @@ export default function AccountProfile() {
           `/user/`+JSON.parse(storedDataString)["email"]
         );     
 
-        if(updateddata){
-          setProfile(updateddata.data.userdata)
-          const pr=updateddata.data.userdata
-          sessionStorage.setItem('userdata', JSON.stringify({
-            email: pr.email,
-            name: pr.name,
-            pregnancyMonth: pr.pregnancyMonth,
-            working: pr.working,
-            height: pr.height,
-            weight: pr.weight,
-            age:pr.age
-          }));
+        if (updateddata) {
+        setProfile(updateddata.data.userdata);
+        const pr = updateddata.data.userdata;
+
+        // Only store minimal, non-sensitive info
+        const safeUserData = {
+          email: pr.email,
+          name: pr.name,
+          pregnancyMonth: pr.pregnancyMonth,
+          working: pr.working,
+          height: pr.height,
+          weight: pr.weight,
+          age: pr.age
+        };
+
+        try {
+          sessionStorage.setItem('userdata', JSON.stringify(safeUserData));
+        } catch (err) {
+          console.warn("Failed to save user data to sessionStorage:", err);
         }
+      }
 
       } catch (err) {
         alert("please try after sometime");
@@ -292,3 +300,4 @@ export default function AccountProfile() {
     </div>
   );
 }
+
