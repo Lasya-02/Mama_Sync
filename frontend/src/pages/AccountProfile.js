@@ -63,7 +63,13 @@ export default function AccountProfile() {
     pregnancyMonth: extras.pregnancyMonth,
     working: extras.working,
     height: extras.height,
-    weight: extras.weight
+    weight: extras.weight,
+    workHours: pr.workHours,
+    wakeTime: pr.wakeTime,
+    sleepTime: pr.sleepTime,
+    mealTime: pr.mealTime,
+    emergencyContact: pr.emergencyContact,
+    dueDate: pr.dueDate
   });
 }
 
@@ -312,6 +318,7 @@ export default function AccountProfile() {
     </div>
   );
 }
+
 
 
 
