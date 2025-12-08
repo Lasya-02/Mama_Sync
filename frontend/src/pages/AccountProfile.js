@@ -35,43 +35,19 @@ export default function AccountProfile() {
           `/user/`+JSON.parse(storedDataString)["email"]
         );     
 
-        if (updateddata) {
-  const pr = updateddata.data.userdata;
-
-  // Encode sensitive fields
-  const encodedExtras = btoa(JSON.stringify({
-    pregnancyMonth: pr.pregnancyMonth,
-    working: pr.working,
-    height: pr.height,
-    weight: pr.weight
-  }));
-
-  // Store minimal + encoded extras in sessionStorage
-  sessionStorage.setItem('userdata', JSON.stringify({
-    email: pr.email,
-    name: pr.name,
-    age: pr.age,
-    extras: encodedExtras
-  })); // gh-secret-scan: disable-line
-
-  // Decode immediately to set profile state
-  const extras = JSON.parse(atob(encodedExtras));
-  setProfile({
-    email: pr.email,
-    name: pr.name,
-    age: Number(pr.age) || 0,
-    pregnancyMonth: Number(extras.pregnancyMonth) || 0,
-    working: extras.working,
-    height: Number(extras.height) || 0,
-    weight: Number(extras.weight) || 0,
-    workHours: Number(pr.workHours) || 0,
-    wakeTime: pr.wakeTime,
-    sleepTime: pr.sleepTime,
-    mealTime: pr.mealTime,
-    emergencyContact: pr.emergencyContact,
-    dueDate: pr.dueDate
-  });
-}
+        if(updateddata){
+          setProfile(updateddata.data.userdata)
+          const pr=updateddata.data.userdata
+          sessionStorage.setItem('userdata', JSON.stringify({
+            email: pr.email,
+            name: pr.name,
+            pregnancyMonth: pr.pregnancyMonth,
+            working: pr.working,
+            height: pr.height,
+            weight: pr.weight,
+            age:pr.age
+          }));
+        }
 
       } catch (err) {
         alert("please try after sometime");
@@ -316,10 +292,3 @@ export default function AccountProfile() {
     </div>
   );
 }
-
-
-
-
-
-
-
