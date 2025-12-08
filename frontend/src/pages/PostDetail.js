@@ -60,7 +60,7 @@ export default function PostDetail() {
         <div className="card-body">
           <h2 className="mb-3">{post.title}</h2>
           <p>{post.content}</p>
-          <p><strong>Posted by:</strong> {userName}</p>
+          <p><strong>Posted by:</strong> {post.userId}</p>
           <small className="text-muted">
             {dayjs(post.created_at).local().format("MMM D, YYYY h:mm A")}
           </small>

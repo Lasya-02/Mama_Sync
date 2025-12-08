@@ -1,6 +1,6 @@
-# -------------------------
-# ✅ Build Stage
-# -------------------------
+
+#  Build Stage
+
 FROM node:20 AS build
 
 # Set working directory
@@ -13,9 +13,9 @@ RUN npm ci
 # Copy all source files
 COPY . .
 
-# -------------------------
-# ✅ Build-time Arguments
-# -------------------------
+
+# Build-time Arguments
+
 # Accept API URL and Google Maps API Key from GitHub Actions
 ARG REACT_APP_API_URL
 ENV REACT_APP_API_URL=$REACT_APP_API_URL
@@ -26,9 +26,9 @@ ENV REACT_APP_GOOGLE_MAPS_API_KEY=$REACT_APP_GOOGLE_MAPS_API_KEY
 # Build React app with production env variables
 RUN npm run build
 
-# -------------------------
-# ✅ Production Stage (Nginx)
-# -------------------------
+
+# Production Stage (Nginx)
+
 FROM nginx:alpine
 
 # Remove default Nginx static files

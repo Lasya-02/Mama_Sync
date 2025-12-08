@@ -1,6 +1,5 @@
-/* ================================================================
-   PREGNANCY TRACKER DASHBOARD - GRADIENT DESIGN STYLING
-   ================================================================ */
+
+
 
 * {
   box-sizing: border-box;
@@ -18,9 +17,6 @@ body {
   padding: 24px;
 }
 
-/* ============================================================
-   CUSTOM MODAL
-   ============================================================ */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -205,7 +201,7 @@ body {
 
 .delete-btn {
   background: linear-gradient(135deg, #ef4444, #dc2626);
-  color: white;
+  color: rgb(0, 0, 0);
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
@@ -218,9 +214,7 @@ body {
   transform: translateY(0);
 }
 
-/* ============================================================
-   WELCOME HEADER
-   ============================================================ */
+
 .welcome-header {
   max-width: 1400px;
   margin: 0 auto 32px;
@@ -233,9 +227,6 @@ body {
   margin: 0 0 8px 0;
 }
 
-/* ============================================================
-   TOP STATS CARDS (Water + Tasks)
-   ============================================================ */
 .top-cards {
   max-width: 1400px;
   margin: 0 auto 24px;
@@ -380,9 +371,7 @@ body {
   transition: width 0.3s;
 }
 
-/* ============================================================
-   MAIN CONTENT AREA
-   ============================================================ */
+
 .section-card {
   max-width: 1400px;
   margin: 0 auto 24px;
@@ -428,9 +417,7 @@ body {
   transform: translateY(0);
 }
 
-/* ============================================================
-   TASK LIST
-   ============================================================ */
+
 .tasks-list {
   display: flex;
   flex-direction: column;
@@ -540,9 +527,7 @@ body {
   font-size: 14px;
 }
 
-/* ============================================================
-   FEELINGS CARD
-   ============================================================ */
+
 .feelings-card {
   max-width: 1400px;
   margin: 0 auto 24px;
@@ -614,9 +599,7 @@ body {
   color: #92400e;
 }
 
-/* ============================================================
-   ADDITIONAL INFO CARDS (Tip, Affirmation, Health)
-   ============================================================ */
+
 .tip-card {
   max-width: 1400px;
   margin: 0 auto 24px;
@@ -716,9 +699,7 @@ body {
   margin-right: 8px;
 }
 
-/* ============================================================
-   RESPONSIVE DESIGN
-   ============================================================ */
+
 @media (max-width: 768px) {
   .dashboard-wrapper {
     padding: 16px;

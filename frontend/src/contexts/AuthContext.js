@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const storedToken = sessionStorage.getItem('authToken');
     const storedUser = sessionStorage.getItem('userdata');
-     console.log(sessionStorage.getItem('userdata'),"t1")
+
     if (storedToken && storedUser) {
       try {
         setUser(JSON.parse(storedUser));
@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
           sessionStorage.setItem('userdata', JSON.stringify(response.data.user));
           const storedToken = sessionStorage.getItem('authToken');
           const storedUser = sessionStorage.getItem('userdata');
-          console.log(sessionStorage.getItem('userdata'),"t1")
+
           if (storedToken && storedUser) {
             try {
               setUser(JSON.parse(storedUser));

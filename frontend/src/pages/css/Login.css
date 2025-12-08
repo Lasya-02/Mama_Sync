@@ -1,4 +1,4 @@
-/* Fullscreen layout */
+
 .login-page {
   position: relative;
   width: 100vw;
@@ -7,7 +7,7 @@
   background: linear-gradient(135deg, #171515, #0f1113);
 }
 
-/* Split content */
+
 .login-content {
   display: flex;
   height: 100%;
@@ -16,7 +16,7 @@
   z-index: 1;
 }
 
-/* Left: Brand */
+
 .login-left {
   flex: 1;
   display: flex;
@@ -41,7 +41,7 @@
   margin-left: 6vw;
 }
 
-/* Right: Login Card */
+
 .login-right {
   flex: 1;
   display: flex;
@@ -62,7 +62,7 @@
   min-height: 450px;
 }
 
-/* Header */
+
 .login-header h2 {
   font-size: 2rem;
   color: #ff6b81;
@@ -77,7 +77,7 @@
   margin-bottom: 2rem;
 }
 
-/* Form */
+
 .login-form {
   display: flex;
   flex-direction: column;
@@ -112,7 +112,7 @@
   box-shadow: 0 6px 15px rgba(255, 107, 129, 0.25);
 }
 
-/* Footer */
+
 .login-footer {
   margin-top: 1.5rem;
   text-align: center;
@@ -131,7 +131,7 @@
 }
 
 
-/* Responsive */
+
 @media (max-width: 768px) {
   .login-content {
     flex-direction: column;

@@ -1,4 +1,4 @@
-/* Reset defaults and apply dark background everywhere */
+
 html, body {
   margin: 0;
   padding: 0;
@@ -14,32 +14,37 @@ html, body {
   overflow-x: hidden;
 }
 
-/* Outer card (container with header + form) */
+.text-muted {
+  color: black !important;
+}
+
 .card {
-  background-color: #000000; /* solid black */
-  color: #fafafa;            /* light text */
+  background-color: #000000; 
+  color: #fafafa;            
   border-radius: 8px;
   border: 1px solid #333;
 }
 
-/* Inner post cards (list items) */
+
 .forum-card {
-  background-color: #000000; /* white background */
-  color: #ffffff;            /* dark text */
+  background-color: #000000; 
+  color: #ffffff;           
   border-radius: 6px;
   border-color: #e85c70; 
   transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
-/* Override Bootstrap hover */
+
 .forum-card:hover {
-  background-color: #000000; /* light gray on hover */
-  color: #eb8cac;            /* keep dark text */
+  background-color: #000000;
   transform: scale(1.01);
-  border: none;  
+  border: none;
 }
 
-/* Ensure form inputs look good on black background */
+.forum-card:hover * {
+  color: #000000 !important;
+}
+
 form input.form-control,
 form textarea.form-control {
   background-color: #1c1c1c;
@@ -52,7 +57,7 @@ form textarea.form-control::placeholder {
   color: #aaa;
 }
 
-/* Button styling */
+
 button.btn-primary {
   background-color: #ff6b81;
   border: none;

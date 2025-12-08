@@ -24,7 +24,8 @@ export default function AccountProfile() {
     emergencyContact: "",
     dueDate: "",
     height: "",
-    weight: ""
+    weight: "",
+    age:""
   });
 
     const loaddata = async () => {
@@ -35,7 +36,17 @@ export default function AccountProfile() {
         );     
 
         if(updateddata){
-            setProfile(updateddata.data.userdata)
+          setProfile(updateddata.data.userdata)
+          const pr=updateddata.data.userdata
+          sessionStorage.setItem('userdata', JSON.stringify({
+            email: pr.email,
+            name: pr.name,
+            pregnancyMonth: pr.pregnancyMonth,
+            working: pr.working,
+            height: pr.height,
+            weight: pr.weight,
+            age:pr.age
+          }));
         }
 
       } catch (err) {
@@ -76,7 +87,7 @@ export default function AccountProfile() {
           `/updateprofile`, 
           profile
         );
-
+        await loaddata();
         alert("Profile updated successfully!");
         
       } catch (err) {
@@ -225,6 +236,16 @@ export default function AccountProfile() {
                     value={profile.weight}
                     onChange={(e) => handleChange("weight", e.target.value)}
                   />
+                </div>
+
+                <div>
+                  <label>Age </label>
+                  <input 
+                  type="number" 
+                  min="15" 
+                  max="50" 
+                  value={profile.age}
+                  onChange={(e) => handleChange("age", e.target.value)}                  />
                 </div>
               </div>
 

@@ -38,7 +38,7 @@ export default function Reminder() {
     loadreminder();
   }, []);
 
-  // Check reminders for in-app notification
+
   useEffect(() => {
     const checkReminders = () => {
       const now = new Date();
@@ -64,7 +64,7 @@ export default function Reminder() {
                 ? `${reminder.title}${reminder.description ? " - " + reminder.description : ""} NOW!`
                 : `${reminder.title}${reminder.description ? " - " + reminder.description : ""} in ${targetMinutes} minutes`;
 
-            // In-app notification only
+            
             setInAppNotification({
               id: reminder.id,
               title: reminder.title,

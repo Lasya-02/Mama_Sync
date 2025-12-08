@@ -49,5 +49,4 @@ class WaterIntakeRepository:
             document['_id'] = str(document['_id'])
         return document
 
-# Create a single instance of the repository
 waterintake_repository = WaterIntakeRepository()

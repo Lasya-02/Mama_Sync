@@ -10,7 +10,7 @@ export default function CommunityForum() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
-  // Replace with logged-in userId from your auth context
+  
   const uuss = sessionStorage.getItem("userdata") || "{}";
   const parsedData = JSON.parse(uuss);
   const userId = parsedData.name || "TestUser";
@@ -42,7 +42,6 @@ export default function CommunityForum() {
         <div className="card-body">
           <h2 className="text-center mb-4">Community Forum</h2>
 
-          {/* New Post Form */}
           <form onSubmit={handleSubmit} className="mb-4">
             <div className="mb-3">
               <input
@@ -69,7 +68,6 @@ export default function CommunityForum() {
             </button>
           </form>
 
-          {/* Posts List */}
           <div className="list-group">
             {posts.map((post) => (
               <button

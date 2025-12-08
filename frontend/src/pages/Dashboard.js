@@ -1,11 +1,20 @@
 import { useEffect, useState,useRef } from "react";
 import "./css/Dashboard.css";
 import apiClient from "../service/Api";
+import BmiResultsDisplay from './BmiResultsDisplay';
+import { getUserTasks } from './BMIHelper';
 
 export default function Dashboard() {
-  const uuss = sessionStorage.getItem("userdata") || "{}";
-  const parsedData = JSON.parse(uuss);
+  const userdt = sessionStorage.getItem("userdata") || "{}";
+  const parsedData = JSON.parse(userdt);
   const userId = parsedData.email || "TestUser";
+const age = parsedData.age; 
+const pregnancyMonth= parsedData.pregnancyMonth; 
+const working = parsedData.working;           
+const height = parsedData.height;               
+const weight= parsedData.weight;  
+
+  const effectRan = useRef(false); 
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -20,34 +29,17 @@ export default function Dashboard() {
   const [waterGoal, setWaterGoal] = useState(8);
   const [waterLoading, setWaterLoading] = useState(true);
 
-  // Default preset tasks
-  const defaultTasks = [
-    {
-      emoji: "💧",
-      title: "Drink 8 glasses of water",
-      time: "All day",
-      isPreset: true,
-    },
-    {
-      emoji: "🍎",
-      title: "Eat healthy breakfast",
-      time: "8:00 AM",
-      isPreset: true,
-    },
-    {
-      emoji: "🧘‍♀️",
-      title: "Prenatal yoga stretch",
-      time: "12:00 PM",
-      isPreset: true,
-    },
-    {
-      emoji: "💊",
-      title: "Take prenatal vitamin",
-      time: "9:00 PM",
-      isPreset: true,
-    },
-  ];
-
+  const tips={
+  "1": "Start taking folic acid daily to support your baby’s brain and spine development.",
+  "2": "Eat small, frequent meals and stay hydrated to reduce morning sickness.",
+  "3": "Avoid caffeine, smoking, and alcohol completely to protect your baby’s organ development.",
+  "4": "Your energy may improve now—start light activities like walking or prenatal yoga.",
+  "5": "You may feel your baby move for the first time—schedule your anatomy scan.",
+  "6": "Your baby can hear sounds now—try talking, singing, or playing gentle music.",
+  "7": "Increase iron and calcium intake as your baby gains weight rapidly.",
+  "8": "Sleep on your left side to improve blood flow to your baby.",
+  "9": "Pack your hospital bag and learn the signs of labor—your baby is almost ready!"
+}
   const moods = [
     { emoji: "😊", label: "Happy", value: "happy" },
     { emoji: "😌", label: "Calm", value: "calm" },
@@ -56,11 +48,31 @@ export default function Dashboard() {
     { emoji: "🤢", label: "Unwell", value: "unwell" },
   ];
 
-    const effectRan = useRef(false); 
 
-  // ----------------------------------------------------------------
+
   // LOAD TASKS
-  // ----------------------------------------------------------------
+  
+
+const appUserData = {
+    age: age, 
+    pregnancyMonth: pregnancyMonth,
+    working: working,
+    height: height,
+    weight: weight,
+};
+
+const dailyTaskList = getUserTasks(appUserData);
+
+
+  useEffect(() => {
+     if (!effectRan.current) {
+      loadTasks();
+      loadWaterIntake();
+      loadMood();
+      effectRan.current = true;
+     }
+  }, []);
+  
   const loadTasks = async () => {
     try {
       const res = await apiClient.get(`/tasks`, {
@@ -76,39 +88,30 @@ export default function Dashboard() {
       }
     } catch (e) {
       console.error("Error loading tasks:", e);
-      setTasks(defaultTasks.map((t, i) => ({ ...t, id: i, completed: false })));
+      setTasks(dailyTaskList.map((t, i) => ({ ...t, id: i, completed: false })));
     } finally {
       setLoading(false);
     }
   };
 
-  // ----------------------------------------------------------------
   // INITIALIZE DEFAULT TASKS
-  // ----------------------------------------------------------------
+
   const initializeDefaultTasks = async () => {
     try {
-      const promises = defaultTasks.map(async (task) =>
-        await apiClient.post(`/tasks`, {
-          userId,
-          date: today,
-          emoji: task.emoji,
-          title: task.title,
-          time: task.time,
-          completed: false,
-          isPreset: true,
-        })
-      );
 
-      await Promise.all(promises);
+      await apiClient.post(`/tasks/`+ userId + '/' +today, {
+        tasks:dailyTaskList
+        })
+
       await loadTasks();
     } catch (e) {
       console.error("Error initializing default tasks:", e);
     }
   };
 
-  // ----------------------------------------------------------------
+  
   // LOAD WATER INTAKE
-  // ----------------------------------------------------------------
+
   const loadWaterIntake = async () => {
     try {
       const res = await apiClient.get(`/waterintake`, {
@@ -116,20 +119,17 @@ export default function Dashboard() {
       });
 
       if (res.data.data) {
-        // Convert ml to glasses (250ml per glass)
         const glasses = Math.floor(res.data.data.currentIntake / 250);
         setWaterIntake(glasses);
         const goalGlasses = Math.floor(res.data.data.goalIntake / 250);
         setWaterGoal(goalGlasses);
 
-        // Show message if it's a new day
         if (res.data.message && res.data.message.includes("New day")) {
           console.log("🌅 New day started! Water intake reset to 0");
         }
       }
     } catch (e) {
       console.error("Error loading water intake:", e);
-      // Fallback to defaults if API fails
       setWaterIntake(0);
       setWaterGoal(8);
     } finally {
@@ -137,9 +137,9 @@ export default function Dashboard() {
     }
   };
 
-  // ----------------------------------------------------------------
+  
   // LOAD MOOD
-  // ----------------------------------------------------------------
+ 
   const loadMood = async () => {
     try {
       const res = await apiClient.get(`/mood`, {
@@ -154,19 +154,10 @@ export default function Dashboard() {
     }
   };
 
-  useEffect(() => {
-    if (!effectRan.current) {
-      loadTasks();
-      loadWaterIntake();
-      loadMood();
-      effectRan.current = true;
-    }
 
-  }, []);
 
-  // ----------------------------------------------------------------
   // ADD CUSTOM TASK
-  // ----------------------------------------------------------------
+ 
   const openAddModal = () => {
     setShowAddModal(true);
     setNewTaskTitle("");
@@ -179,15 +170,16 @@ export default function Dashboard() {
     }
 
     try {
-      await apiClient.post(`/tasks`, {
-        userId,
-        date: today,
+
+      await apiClient.post(`/tasks/`+ userId + '/' +today, {
+        tasks:[{      
         emoji: "📝",
         title: newTaskTitle.trim(),
         time: "Anytime",
         completed: false,
         isPreset: false,
-      });
+      }]
+        })
 
       setShowAddModal(false);
       setNewTaskTitle("");
@@ -203,9 +195,9 @@ export default function Dashboard() {
     setNewTaskTitle("");
   };
 
-  // ----------------------------------------------------------------
+
   // TOGGLE COMPLETE
-  // ----------------------------------------------------------------
+ 
   const toggleComplete = async (task) => {
     try {
       await apiClient.patch(
@@ -220,9 +212,9 @@ export default function Dashboard() {
     }
   };
 
-  // ----------------------------------------------------------------
+
   // DELETE A TASK
-  // ----------------------------------------------------------------
+ 
   const openDeleteModal = (task) => {
     setTaskToDelete(task);
     setShowDeleteModal(true);
@@ -250,9 +242,9 @@ export default function Dashboard() {
     setTaskToDelete(null);
   };
 
-  // ----------------------------------------------------------------
+ 
   // HANDLE MOOD SELECTION
-  // ----------------------------------------------------------------
+ 
   const handleMoodSelect = async (moodValue) => {
     try {
       await apiClient.post(`/mood`, {
@@ -263,18 +255,18 @@ export default function Dashboard() {
       setCurrentMood(moodValue);
     } catch (e) {
       console.error("Error saving mood:", e);
-      // Still update UI even if save fails
+      
       setCurrentMood(moodValue);
     }
   };
 
-  // ----------------------------------------------------------------
+
   // WATER INTAKE HANDLERS
-  // ----------------------------------------------------------------
+
   const increaseWater = async () => {
     if (waterIntake < waterGoal) {
       try {
-        // Add 250ml (1 glass)
+      
         await apiClient.patch(
           `/waterintake/add`,
           { amount: 250 },
@@ -290,7 +282,7 @@ export default function Dashboard() {
   const decreaseWater = async () => {
     if (waterIntake > 0) {
       try {
-        // Subtract 250ml (1 glass) - negative amount
+     
         await apiClient.patch(
           `/waterintake/add`,
           { amount: -250 },
@@ -303,24 +295,23 @@ export default function Dashboard() {
     }
   };
 
-  // ----------------------------------------------------------------
+  
   // COUNTS
-  // ----------------------------------------------------------------
+ 
   const completedCount = tasks.filter((t) => t.completed).length;
   const completionPercentage =
     tasks.length === 0 ? 0 : (completedCount / tasks.length) * 100;
   const waterPercentage = waterGoal === 0 ? 0 : (waterIntake / waterGoal) * 100;
 
-  // ----------------------------------------------------------------
+ 
   // UI RETURN
-  // ----------------------------------------------------------------
+
   return (
     <div className="dashboard-wrapper">
-      {/* ---------------------------------------------------------------- */}
-      {/* CUSTOM ADD TASK MODAL */}
-      {/* ---------------------------------------------------------------- */}
+ 
       {showAddModal && (
         <div className="modal-overlay" onClick={closeAddModal}>
+    
           <div className="modal-container" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <div className="modal-icon">✨</div>
@@ -329,7 +320,6 @@ export default function Dashboard() {
                 What would you like to accomplish today?
               </p>
             </div>
-
             <div className="modal-body">
               <input
                 type="text"
@@ -341,7 +331,6 @@ export default function Dashboard() {
                 autoFocus
               />
             </div>
-
             <div className="modal-footer">
               <button className="modal-btn cancel-btn" onClick={closeAddModal}>
                 Cancel
@@ -354,9 +343,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* ---------------------------------------------------------------- */}
-      {/* CUSTOM DELETE CONFIRMATION MODAL */}
-      {/* ---------------------------------------------------------------- */}
+
       {showDeleteModal && taskToDelete && (
         <div className="modal-overlay" onClick={closeDeleteModal}>
           <div
@@ -401,12 +388,13 @@ export default function Dashboard() {
       <div className="welcome-header">
         <h1>Welcome Mama!</h1>
       </div>
+      <div className="welcome-header">
+    
+        <BmiResultsDisplay userData={appUserData} />
+      </div>
 
-      {/* ---------------------------------------------------------------- */}
-      {/*  TOP STATS CARDS (Water + Daily Tasks) */}
-      {/* ---------------------------------------------------------------- */}
       <div className="top-cards">
-        {/* Water Intake */}
+
         <div className="card water-card">
           <span className="water-label">Water Intake 💧</span>
           {waterLoading ? (
@@ -445,7 +433,7 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Daily Tasks */}
+
         <div className="card tasks-card">
           <span className="tasks-label">Daily Tasks</span>
           <div className="tasks-value">
@@ -460,9 +448,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ---------------------------------------------------------------- */}
-      {/* TODAY'S TASK LIST */}
-      {/* ---------------------------------------------------------------- */}
+
       <div className="section-card tasks-section">
         <div className="section-header">
           <h3>📅 Today's Tasks</h3>
@@ -508,9 +494,7 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* ---------------------------------------------------------------- */}
-      {/* FEELINGS CHECK-IN */}
-      {/* ---------------------------------------------------------------- */}
+
       <div className="feelings-card">
         <h3>😊 How are you feeling today?</h3>
         <div className="feelings-row">
@@ -529,15 +513,12 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ---------------------------------------------------------------- */}
-      {/* ADDITIONAL INFO CARDS */}
-      {/* ---------------------------------------------------------------- */}
+
 
       <div className="tip-card">
-        <h3>💡 Tip of the Day</h3>
+        <h3>💡 Tip of the month</h3>
         <p>
-          At 24 weeks, your baby can hear sounds from outside! Try reading,
-          singing, or playing gentle music.
+          {tips[pregnancyMonth] || "Stay positive and take care of yourself!"}
         </p>
       </div>
 
@@ -547,15 +528,6 @@ export default function Dashboard() {
           "I am strong, capable, and creating life. Every day my body does
           amazing things for my baby."
         </p>
-      </div>
-
-      <div className="health-card">
-        <h3>🌿 Health Reminder</h3>
-        <ul>
-          <li>Take your prenatal vitamin</li>
-          <li>Gentle walking for 20–30 min</li>
-          <li>Sleep on your left side</li>
-        </ul>
       </div>
     </div>
   );

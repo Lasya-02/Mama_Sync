@@ -16,6 +16,7 @@ from waterintakerepository import waterintake_repository
 from moodrepository import mood_repository
 import jwt
 from datetime import datetime, timedelta, timezone
+from typing import List
 
 app = FastAPI()
 
@@ -30,12 +31,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-#-------JWT-----
+# JWT
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "dev_secret_key")
 SECRET_KEY = JWT_SECRET_KEY
 ALGORITHM = "HS256"
 
-#-----MONGODB CONNECTION----
+# MONGODB CONNECTION
 
 
 tasks_collection = mongo_db.get_collection("daily_tasks")
@@ -45,15 +46,16 @@ guide_collection = mongo_db.get_collection("guide")
 waterintake_collection = mongo_db.get_collection("water_intake")
     
 
-# ---------- MODELS ----------
+# MODELS
 class TaskCreate(BaseModel):
-    userId: str
-    date: str               # "YYYY-MM-DD"
     emoji: str
     title: str
     time: str
     completed: bool = False
     isPreset: bool = False
+
+class UsersDailyTasksWrapper(BaseModel):
+    tasks: List[TaskCreate]
 
 class ForumPost(BaseModel):
     userId: str
@@ -89,13 +91,14 @@ class UserRegistration(BaseModel):
     pregnancyMonth: int
     working: bool
     workHours: int
-    wakeTime: str  # Pydantic v2 handles time objects
+    wakeTime: str  
     sleepTime: str
     mealTime: str
-    emergencyContact: str # Stored as a simple string for the number/info
-    dueDate: str   # Pydantic v2 handles date objects
+    emergencyContact: str 
+    dueDate: str  
     height: float
     weight: float
+    age : int
 
 class UserUpdate(BaseModel):
     email: EmailStr
@@ -103,33 +106,34 @@ class UserUpdate(BaseModel):
     pregnancyMonth: int
     working: bool
     workHours: int
-    wakeTime: str  # Pydantic v2 handles time objects
+    wakeTime: str  
     sleepTime: str
     mealTime: str
-    emergencyContact: str # Stored as a simple string for the number/info
-    dueDate: str   # Pydantic v2 handles date objects
+    emergencyContact: str 
+    dueDate: str  
     height: float
     weight: float
+    age : int
 
 class WaterIntakeData(BaseModel):
     userId: str
-    date: str  # "YYYY-MM-DD"
-    goalIntake: int  # in ml
-    currentIntake: int = 0  # in ml
+    date: str  
+    goalIntake: int  
+    currentIntake: int = 0  
 
 class WaterIntakeUpdate(BaseModel):
-    amount: int  # amount to add in ml
+    amount: int  
 
 class MoodData(BaseModel):
     userId: str
-    date: str  # "YYYY-MM-DD"
-    mood: str  # "happy", "calm", "tired", "anxious", "unwell"
+    date: str  
+    mood: str 
 
-# ---------- HELPERS ----------
+#  HELPERS
 def build_task_dict(task: TaskCreate) -> dict:
     """Create a new task object with its own id."""
     return {
-        "id": str(ObjectId()),            # task-level id for frontend
+        "id": str(ObjectId()),            
         "emoji": task.emoji,
         "title": task.title,
         "time": task.time,
@@ -175,10 +179,10 @@ def validate_token_manual(request: Request):
             detail="Missing or invalid Authorization header",
         )
     
-    token = auth_header.split("Bearer ")[1] # Get the token string
+    token = auth_header.split("Bearer ")[1] 
     verify_token(token)
    
-# ---------- ROUTES ----------
+# ROUTES
 
 @app.post("/login",status_code=status.HTTP_200_OK)
 def login_for_access_token(user_data: UserLogin):
@@ -208,6 +212,11 @@ def login_for_access_token(user_data: UserLogin):
            "user":{
            "email": user_in_db['email'],
            "name" : user_in_db['name'],
+           "age" : user_in_db['age'],
+           "height":user_in_db['height'],
+           "weight":user_in_db['weight'],
+           "working":user_in_db['working'],
+           "pregnancyMonth":user_in_db['pregnancyMonth']
            },
            "token": token
        }
@@ -235,12 +244,12 @@ def register_user(user_data: UserRegistration):
 
 @app.get("/users")
 def get_user(request:Request,status_code=status.HTTP_200_OK):
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request)
     return user_repository.find_all()
 
 @app.get("/user/{id}")
 def get_userbyid(request:Request,id):
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request)
     res = user_repository.find_by_email(id)
     return JSONResponse(
            status_code=status.HTTP_200_OK,
@@ -257,7 +266,8 @@ def get_userbyid(request:Request,id):
                 "emergencyContact": res["emergencyContact"],
                 "dueDate": res["dueDate"],
                 "height": res["height"],
-                "weight": res["weight"]
+                "weight": res["weight"],
+                "age" : res['age']
             }
         }
     )
@@ -266,7 +276,7 @@ def get_userbyid(request:Request,id):
 @app.put("/updateprofile")
 def update_user(request:Request,user_data: UserUpdate):
 
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request)
 
     # Convert Pydantic model to a dictionary for PyMongo
     user_dict = user_data.model_dump()
@@ -291,7 +301,7 @@ def get_tasks(request:Request,userId: str, date: str):
     Get all tasks for a user for a given date.
     ONE document per (userId, date) with tasks array.
     """
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request) 
 
     doc = find_doc(userId, date)
     if not doc:
@@ -299,30 +309,32 @@ def get_tasks(request:Request,userId: str, date: str):
     return {"tasks": doc.get("tasks", [])}
 
 
-@app.post("/tasks")
-def create_task(request:Request,task: TaskCreate):
+@app.post("/tasks/{userId}/{date}")
+def create_task(request:Request,userId:str,date:str,tasks: UsersDailyTasksWrapper):
     """
     Add one task to the user's task list for that date.
     If doc doesn't exist, create it.
     """
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request) 
 
-    existing = find_doc(task.userId, task.date)
-    new_task = build_task_dict(task)
 
-    if existing:
-        tasks_collection.update_one(
-            {"_id": existing["_id"]},
-            {"$push": {"tasks": new_task}}
-        )
-    else:
-        tasks_collection.insert_one(
-            {
-                "userId": task.userId,
-                "date": task.date,
-                "tasks": [new_task],
-            }
-        )
+    for task in tasks.tasks:
+        existing = find_doc(userId, date)
+        new_task = build_task_dict(task)
+
+        if existing:
+            tasks_collection.update_one(
+                {"_id": existing["_id"]},
+                {"$push": {"tasks": new_task}}
+            )
+        else:
+            tasks_collection.insert_one(
+                {
+                    "userId": userId,
+                    "date": date,
+                    "tasks": [new_task],
+                }
+            )
 
     return {"task": new_task}
 
@@ -332,7 +344,7 @@ def update_task(request:Request,task_id: str, userId: str, date: str, patch: Tas
     """
     Update one task in the tasks array (currently only 'completed').
     """
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request) 
 
     update_ops = {}
 
@@ -363,7 +375,7 @@ def delete_task(request:Request,task_id: str, userId: str, date: str):
     """
     Delete one task from the tasks array.
     """
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request) 
 
     result = tasks_collection.update_one(
         {"userId": userId, "date": date},
@@ -381,7 +393,7 @@ def mark_all_complete(request:Request,userId: str, date: str):
     """
     Mark all tasks for this user & date as completed.
     """
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request) 
 
     result = tasks_collection.update_one(
         {"userId": userId, "date": date},
@@ -395,11 +407,11 @@ def mark_all_complete(request:Request,userId: str, date: str):
 
 @app.post("/forum", status_code=201)
 def create_post(request:Request,post: ForumPost):
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request) 
 
     post_dict = post.model_dump()
     post_dict["created_at"] = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
-    post_dict["replies"] = []   # initialize empty replies array
+    post_dict["replies"] = []  
     result = forum_collection.insert_one(post_dict)
     post_dict["_id"] = str(result.inserted_id)
     return post_dict
@@ -407,7 +419,7 @@ def create_post(request:Request,post: ForumPost):
 
 @app.get("/forum")
 def get_posts(request:Request,userId: Optional[str] = None):
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request) 
 
     query = {"userId": userId} if userId else {}
     posts = list(forum_collection.find(query))
@@ -418,7 +430,7 @@ def get_posts(request:Request,userId: Optional[str] = None):
 
 @app.get("/forum/{post_id}")
 def get_post(request:Request,post_id: str):
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request) 
 
     post = forum_collection.find_one({"_id": ObjectId(post_id)})
     if not post:
@@ -429,7 +441,7 @@ def get_post(request:Request,post_id: str):
 
 @app.post("/forum/{post_id}/replies", status_code=201)
 def add_reply(request:Request,post_id: str, reply: ForumReply):
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request) 
 
     reply_dict = reply.model_dump()
     reply_dict["id"] = str(ObjectId())
@@ -448,7 +460,7 @@ def add_reply(request:Request,post_id: str, reply: ForumReply):
 
 @app.get("/forum/{post_id}/replies")
 def get_replies(request:Request,post_id: str):
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request) 
 
     post = forum_collection.find_one({"_id": ObjectId(post_id)})
     if not post:
@@ -457,7 +469,7 @@ def get_replies(request:Request,post_id: str):
 
 @app.get("/getreminder")
 def get_reminder(request:Request,userId: str):
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request)
 
     doc = reminder_collection.find_one({"userId": userId})
     if not doc:
@@ -467,7 +479,7 @@ def get_reminder(request:Request,userId: str):
 
 @app.post("/createreminder")
 def create_reminder(request:Request,reminder: ReminderData):
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request) 
 
     existing = reminder_collection.find_one({"userId": reminder.userId})
     new_reminder = {
@@ -501,7 +513,7 @@ def delete_reminder(request:Request,reminder_id: str, userId: str):
     """
     Delete one task from the tasks array.
     """
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request)
 
     result = reminder_collection.update_one(
         {"userId": userId},
@@ -515,7 +527,7 @@ def delete_reminder(request:Request,reminder_id: str, userId: str):
     
 @app.put("/updatereminder/{reminder_id}")
 def update_task(request:Request,reminder_id: str, userId: str, patch: ReminderData):
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request) 
 
     update_ops = {}
     
@@ -549,7 +561,7 @@ def update_task(request:Request,reminder_id: str, userId: str, patch: ReminderDa
     
 @app.get("/guide")
 def get_guides(request:Request):
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request) 
 
     docs = list(guide_collection.find({}, {"_id": 1, "title": 1}))
     # Convert ObjectId to string if needed
@@ -559,7 +571,7 @@ def get_guides(request:Request):
 
 @app.get("/guide/{doc_id}")
 def get_guide_content(request:Request,doc_id: str):
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request) 
 
     doc = guide_collection.find_one({"_id": doc_id})
     if not doc:
@@ -568,7 +580,7 @@ def get_guide_content(request:Request,doc_id: str):
     doc["_id"] = str(doc["_id"])
     return doc
 
-# ---------- WATER INTAKE ROUTES ----------
+# WATER INTAKE ROUTES
 
 @app.get("/waterintake")
 def get_water_intake(request:Request,userId: str, date: str):
@@ -577,7 +589,7 @@ def get_water_intake(request:Request,userId: str, date: str):
     Automatically creates a new record for today with 0 intake if it doesn't exist.
     Uses the user's previous goal or defaults to 2000ml.
     """
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request) 
 
     intake = waterintake_repository.find_by_user_and_date(userId, date)
     
@@ -606,7 +618,7 @@ def create_water_intake(request:Request,intake: WaterIntakeData):
     Create a new water intake record for a user on a specific date.
     If a record already exists, return an error.
     """
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request) 
 
     existing = waterintake_repository.find_by_user_and_date(intake.userId, intake.date)
     
@@ -629,7 +641,7 @@ def add_water_intake(request:Request,userId: str, date: str, update: WaterIntake
     Increment water intake by a specific amount.
     Creates a new record with default goal if it doesn't exist.
     """
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request) 
 
     existing = waterintake_repository.find_by_user_and_date(userId, date)
     
@@ -661,7 +673,7 @@ def update_water_goal(request:Request,userId: str, date: str, goalIntake: int):
     """
     Update the daily water intake goal for a user.
     """
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request) 
 
     existing = waterintake_repository.find_by_user_and_date(userId, date)
     
@@ -692,7 +704,7 @@ def reset_water_intake(request:Request,userId: str, date: str):
     """
     Reset the current water intake to 0 for a specific date.
     """
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request) 
 
     existing = waterintake_repository.find_by_user_and_date(userId, date)
     
@@ -713,7 +725,7 @@ def delete_water_intake(request:Request,userId: str, date: str):
     """
     Delete water intake record for a specific date.
     """
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request) 
 
     success = waterintake_repository.delete(userId, date)
     
@@ -724,7 +736,7 @@ def delete_water_intake(request:Request,userId: str, date: str):
 
 
 
-# ---------- MOOD TRACKING ROUTES ----------
+# MOOD TRACKING ROUTES
 
 @app.post("/mood", status_code=201)
 def create_mood(request:Request,mood: MoodData):
@@ -732,7 +744,7 @@ def create_mood(request:Request,mood: MoodData):
     Save or update mood for a user on a specific date.
     If mood already exists for that date, update it.
     """
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request) 
 
     # Validate mood value
     valid_moods = ["happy", "calm", "tired", "anxious", "unwell"]
@@ -766,7 +778,7 @@ def get_mood(request:Request,userId: str, date: Optional[str] = None):
     If date is provided, get mood for that specific date.
     If date is not provided, get all mood history (last 30 days).
     """
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request) 
 
     if date:
         mood = mood_repository.find_by_user_and_date(userId, date)
@@ -783,7 +795,7 @@ def update_mood(request:Request,mood: MoodData):
     """
     Update mood value for a specific user and date.
     """
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request) 
 
     # Validate mood value
     valid_moods = ["happy", "calm", "tired", "anxious", "unwell"]
@@ -815,7 +827,7 @@ def delete_mood(request:Request,userId: str, date: str):
     """
     Delete mood entry for a specific date.
     """
-    validate_token_manual(request) # Run the validation check
+    validate_token_manual(request) 
 
     success = mood_repository.delete(userId, date)
     
@@ -823,7 +835,4 @@ def delete_mood(request:Request,userId: str, date: str):
         raise HTTPException(status_code=404, detail="Mood entry not found")
     
     return {"message": "Mood entry deleted"}
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
 

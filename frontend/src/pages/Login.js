@@ -20,9 +20,7 @@ export default function Login() {
    
       try {
         await login(email, password ); 
-        console.log("test");
         navigate("/dashboard");
-        console.log("test123");
       } catch (err) {
         setloginError(err.response?.data?.message || 'Login failed. Invalid credentials.');
       }
@@ -58,13 +56,13 @@ export default function Login() {
       </div>
 
       <div className="login-content">
-        {/* Left: Header */}
+  
         <div className="login-left">
           <h1 className="brand-title">MamaSync</h1>
           <p className="brand-tagline">Caring, tracking, and bonding — all in one place.</p>
         </div>
 
-        {/* Right: Login Card */}
+  
         <div className="login-right">
           <div className="login-box">
             <div className="login-header">

@@ -4,7 +4,7 @@ import './css/Layout.css';
 export default function Dashboard() {
   return (
     <div className="dashboard-layout">
-      {/* Sidebar Navigation */}
+     
       <aside className="icon-sidebar">
         <Link to="/dashboard" className="sidebar-item" title="Dashboard">
           <i className="bi bi-house-door"></i>
@@ -28,7 +28,7 @@ export default function Dashboard() {
         </Link>
       </aside>
 
-      {/* Main Content */}
+
       <div className="dashboard-main">
         <header className="dashboard-header">
           <h1 className="header">MamaSync</h1>
@@ -40,7 +40,7 @@ export default function Dashboard() {
           
         </header>
 
-        {/* This renders the nested page content */}
+    
         <div className="dashboard-content">
           <Outlet />
         </div>

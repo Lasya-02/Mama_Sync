@@ -21,9 +21,6 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
     (_) =>_,
     async (error)=>{
-
-        //const req = error._;
-
         if(error.response.status=== 401){
             window.location.href="/"
         }

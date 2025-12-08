@@ -15,7 +15,7 @@ export default function Hospitals() {
     return blockedWords.some((word) => lower.includes(word));
   };
 
-  // ✅ Load Google Maps script (async loader)
+  // Load Google Maps script (async loader)
   const loadMapsScript = (callback) => {
     if (document.getElementById("google-maps-script")) {
       callback();
@@ -30,7 +30,7 @@ export default function Hospitals() {
     document.body.appendChild(script);
   };
 
-  // ✅ Fetch hospitals using Places API
+  // Fetch hospitals using Places API
   const fetchNearbyHospitals = async (location, mapObj) => {
     try {
       setError("");
@@ -108,12 +108,12 @@ export default function Hospitals() {
     }
   };
 
-  // ✅ Initialize Google Maps script
+  // Initialize Google Maps script
   useEffect(() => {
     loadMapsScript(() => {});
   }, []);
 
-  // ✅ Handle manual search
+  // Handle manual search
   const handleSearch = async (e) => {
     e.preventDefault();
     if (!address) return;
@@ -156,7 +156,7 @@ export default function Hospitals() {
       <h2>🏥 Nearby Hospitals</h2>
       <p>Find trusted hospitals and clinics near your location.</p>
 
-      {/* Manual input */}
+  
       <form onSubmit={handleSearch} style={{ marginBottom: "20px" }}>
         <input
           type="text"

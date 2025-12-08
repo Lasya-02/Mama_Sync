@@ -10,7 +10,7 @@ export default function Register() {
   const [password, setPassword] = useState('');
   const [pregnancyMonth, setPregnancyMonth] = useState('');
   const [working, setWorking] = useState(false);
-  const [workHours, setWorkHours] = useState('');
+  const [workHours, setWorkHours] = useState(0);
   const [wakeTime, setWakeTime] = useState('');
   const [sleepTime, setSleepTime] = useState('');
   const [mealTime, setMealTime] = useState('');
@@ -18,6 +18,7 @@ export default function Register() {
   const [dueDate, setDueDate] = useState('');
   const [height, setHeight] = useState('');
   const [weight, setWeight] = useState('');
+  const [age, setAge] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [formError, setFormError] = useState('');
   const navigate = useNavigate();
@@ -43,6 +44,53 @@ export default function Register() {
     return strongRegex.test(pwd);
   };
 
+  function validateDueDate(inputDueDate, currentPregnancyMonth) {
+   
+    const parts = inputDueDate.split('-');
+    if (parts.length !== 3) {
+        return "Invalid date format. Please use YYYY-MM-DD.";
+    }
+    
+  
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1; 
+    const day = parseInt(parts[2], 10);
+
+    const dueDate = new Date(year, month, day);
+    const today = new Date();
+  
+    today.setHours(0, 0, 0, 0);
+
+    if (isNaN(dueDate.getTime())) {
+        return "Invalid date entered.";
+    }
+
+    
+    const totalWeeksInPregnancy = 40;
+    const weeksPerMonth = totalWeeksInPregnancy / 9;
+
+   
+    const weeksRemaining = totalWeeksInPregnancy - ((currentPregnancyMonth - 1) * weeksPerMonth);
+    
+ 
+    const remainingMs = weeksRemaining * 604800000;
+
+    
+    const earliestValidDate = new Date(today.getTime() + remainingMs - (28 * 24 * 60 * 60 * 1000));
+    const latestValidDate = new Date(today.getTime() + remainingMs + (28 * 24 * 60 * 60 * 1000));
+
+ 
+    if (dueDate < today) {
+        return "Due date cannot be in the past.";
+    }
+
+    if (dueDate < earliestValidDate || dueDate > latestValidDate) {
+        return `Due date seems incorrect for a ${currentPregnancyMonth}-month pregnancy. Expected window is roughly between ${earliestValidDate.toLocaleDateString()} and ${latestValidDate.toLocaleDateString()}.`;
+    }
+
+    return null; 
+}
+
   const handleRegister = async (e) => {
     e.preventDefault();
     setFormError('');
@@ -55,31 +103,46 @@ export default function Register() {
     }
     setPasswordError('');
 
-    if (pregnancyMonth && (pregnancyMonth < 1 || pregnancyMonth > 9)) {
+    const month = Number(pregnancyMonth);
+    if (pregnancyMonth && (month < 1 || month > 9)) {
       setFormError('Pregnancy month must be between 1 and 9.');
       return;
     }
-    if (working && workHours && (workHours < 1 || workHours > 16)) {
+    
+    const hours = Number(workHours);
+    if (working && workHours && (hours < 1 || hours > 16)) {
       setFormError('Work hours must be between 1 and 16.');
       return;
     }
-    if (height && (height < 100 || height > 250)) {
+    
+    const cm = Number(height);
+    if (height && (cm < 100 || cm > 250)) {
       setFormError('Height must be between 100 and 250 cm.');
       return;
     }
-    if (weight && (weight < 30 || weight > 200)) {
+
+    const kg = Number(weight);
+    if (weight && (kg < 30 || kg > 200)) {
       setFormError('Weight must be between 30 and 200 kg.');
       return;
     }
+    
     if (emergencyContact && !/^\d{10}$/.test(emergencyContact)) {
       setFormError('Emergency contact must be a 10-digit number.');
       return;
     }
 
-   try {
+    const errduedate = validateDueDate(dueDate,month)
+
+    if(errduedate!=null){
+      setFormError(errduedate)
+    }
+
+    if(formError==''){
+    try {
 
         const response = await apiClient.post(
-          `/register`, // Replace with your backend URL
+          `/register`, 
           {
             "email": email,
             "name": name,
@@ -93,7 +156,8 @@ export default function Register() {
             "emergencyContact": emergencyContact,
             "dueDate": dueDate,
             "height": height,
-            "weight": weight
+            "weight": weight,
+            "age":age
           }        
         );
 
@@ -101,6 +165,7 @@ export default function Register() {
       } catch (err) {
         setFormError(err.response?.data?.message || 'Registration failed. Please try again.');
       }  
+    }
     };
 
   return (
@@ -170,6 +235,10 @@ export default function Register() {
                 <div>
                   <label>Weight (kg)</label>
                   <input type="number" min="30" max="200" value={weight} onChange={(e) => setWeight(e.target.value)} />
+                </div>
+                 <div>
+                  <label>Age </label>
+                  <input type="number" min="15" max="50" value={age} onChange={(e) => setAge(e.target.value)} />
                 </div>
               </div>
               {formError && <p className="error-text">{formError}</p>}
