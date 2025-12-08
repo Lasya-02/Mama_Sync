@@ -59,12 +59,12 @@ export default function AccountProfile() {
   setProfile({
     email: pr.email,
     name: pr.name,
-    age: pr.age,
-    pregnancyMonth: extras.pregnancyMonth,
+    age: Number(pr.age) || 0,
+    pregnancyMonth: Number(extras.pregnancyMonth) || 0,
     working: extras.working,
-    height: extras.height,
-    weight: extras.weight,
-    workHours: pr.workHours,
+    height: Number(extras.height) || 0,
+    weight: Number(extras.weight) || 0,
+    workHours: Number(pr.workHours) || 0,
     wakeTime: pr.wakeTime,
     sleepTime: pr.sleepTime,
     mealTime: pr.mealTime,
@@ -318,6 +318,7 @@ export default function AccountProfile() {
     </div>
   );
 }
+
 
 
 
